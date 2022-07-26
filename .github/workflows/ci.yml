@@ -17,8 +17,8 @@ jobs:
       matrix:
         toolchain:
           - stable
-          - beta
-          - nightly
+#           - beta
+#           - nightly
 
     steps:
     - name: Checkout
@@ -49,14 +49,14 @@ jobs:
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-    # how 1: specify image name, 2: specify code to be imaged.
-     - name: Build and push
-       uses: docker/build-push-action@v3
-       with:
-         push: true
-         tags: user/app:latest
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    - name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        context: .
+        tags: user/app:latest
 
   # deploy:
   #   meeds: build
