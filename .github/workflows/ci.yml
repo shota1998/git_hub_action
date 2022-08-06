@@ -17,8 +17,7 @@ jobs:
     # Create .env
     # -----------------------
     - name: Create env file
-    - shell: bash
-    - run: |
+      run: |
         touch .env
         echo ENV_VALUE=${{ secrets.SAMPLE_ENV_VALUE }} >> .env
         cat .env
