@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  homepage-api:
+    container_name: 'homepage-api'
+    # build: .
+    image: test
+    tty: true
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
