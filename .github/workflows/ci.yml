@@ -65,8 +65,8 @@ jobs:
     # -----------------------
     # Rust
     # -----------------------
-    # - name: Setup
-    #   run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+    - name: Setup
+      run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
 
     # - name: Build
     #   run: cargo build --verbose
