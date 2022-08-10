@@ -52,7 +52,6 @@ jobs:
         builder: ${{ steps.buildx.outputs.name }}
         tags: test:latest
         load: true
-        # context: docker/php-fpm
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
 
@@ -65,14 +64,28 @@ jobs:
     # -----------------------
     # Rust
     # -----------------------
+    - name: Install Python
+      uses: actions/setup-python@v2
+
+    - name: Restore mtime
+      run: python ./git-restore-mtime.py
+
+    - name: Cache Rust
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
     - name: Setup
       run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
 
-    # - name: Build
-    #   run: cargo build --verbose
-
-    # - name: Run tests
-    #   run: cargo test --verbose
+    - name: Build
+      run: cargo build --verbose
 
     # -----------------------
     # Teardown
