@@ -2,7 +2,7 @@ name: Rust
 
 on:
   push:
-    branches: [ "push-image" ]
+    branches: [ "hoge-push-image" ]
   pull_request:
     branches: [ "main" ]
 
@@ -38,7 +38,7 @@ jobs:
           ${{ github.ref }}
           refs/head/main
 
-    - name: Build / Push image
+    - name: Build image
       uses: docker/build-push-action@v3
       with:
         builder: ${{ steps.buildx.outputs.name }}
