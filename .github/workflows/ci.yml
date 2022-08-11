@@ -2,7 +2,7 @@ name: Rust
 
 on:
   push:
-    branches: [ "cache-container" ]
+    branches: [ "push-image" ]
   pull_request:
     branches: [ "main" ]
 
