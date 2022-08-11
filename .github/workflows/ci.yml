@@ -37,20 +37,14 @@ jobs:
         restore-keys: |
           ${{ github.ref }}
           refs/head/main
-        
-    # - name: Build and push
-    #   uses: docker/build-push-action@v3
-    #   with:
-    #     push: true
-    #     context: .
-    #     tags: user/app:latest
 
-    - name: Build images
+    - name: Build / Push images
       uses: docker/build-push-action@v3
       with:
-        push: false
+        push: true
+        context: .
         builder: ${{ steps.buildx.outputs.name }}
-        tags: test:latest
+        tags: ${{ env.REGISTRY }}/${{ github.actor }}/practice/push_image:latest
         load: true
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
