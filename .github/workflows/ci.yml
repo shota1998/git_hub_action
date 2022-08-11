@@ -45,13 +45,13 @@ jobs:
           ${{ github.ref }}
           refs/head/main
 
-    - name: Build / Push images
+    - name: Build / Push image
       uses: docker/build-push-action@v3
       with:
         push: true
-        context: .
+        # context: .
         builder: ${{ steps.buildx.outputs.name }}
-        tags: ${{ env.REGISTRY }}/${{ github.actor }}/practice/push_image:latest
+        # tags: ${{ env.REGISTRY }}/${{ github.actor }}/practice/push_image:latest
         load: true
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
