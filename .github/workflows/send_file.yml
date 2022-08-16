@@ -16,8 +16,18 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       
+#     - name: Copy file via ssh password
+#       run:  |
+#         touch private_key
+#         echo "${{ secrets.KEY }}" >> private_key 
+#         scp -i private_key  docker-compose.yml ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
+
     - name: Copy file via ssh password
-      run:  |
-        touch private_key
-        echo "${{ secrets.KEY }}" >> private_key 
-        scp -i private_key  docker-compose.yml ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
+      uses: lBeJIuk/scp_action@v1
+      with:
+        public_key: ${{ secrets.KEY }}
+        ssh_port: 22
+        ssh_username: ${{ secrets.DEST_USER }}
+        ssh_host: ${{ secrets.DEST_IP }}
+        source: ${{ secrets.DEST_DIR }}
+        target: docker-compose.yml
