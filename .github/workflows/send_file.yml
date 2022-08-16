@@ -20,7 +20,7 @@ jobs:
       run:  |
         touch private_key
         echo ${{ secrets.KEY }} >> private_key 
-        scp -i private_key  docker-compose.yml ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
+      # scp -i private_key  docker-compose.yml ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
       
 #       uses: appleboy/scp-action@master
 #       with:
