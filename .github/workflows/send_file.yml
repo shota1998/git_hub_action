@@ -17,11 +17,13 @@ jobs:
       uses: actions/checkout@v3
       
     - name: Copy file via ssh password
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.KEY }}
-        port: ${{ secrets.PORT }}
-        source: "docker-compose.yml"
-        target: "/home/opc"
+      run:  scp -i ${{ secrets.KEY }}  docker-compose.yml ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
+      
+#       uses: appleboy/scp-action@master
+#       with:
+#         host: ${{ secrets.HOST }}
+#         username: ${{ secrets.USERNAME }}
+#         key: ${{ secrets.KEY }}
+#         port: ${{ secrets.PORT }}
+#         source: "docker-compose.yml"
+#         target: "/home/opc"
