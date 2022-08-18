@@ -27,6 +27,8 @@ jobs:
         ssh_host: ${{ secrets.DEST_IP }}
         source: ${{ steps.test.outputs.download-path }}/world.txt
         target: ${{ secrets.DEST_DIR }}
+
+    - name: Confirm copied file
       run: |
         echo "Copied file : "
         cat ${{ steps.test.outputs.download-path }}/world.txt
