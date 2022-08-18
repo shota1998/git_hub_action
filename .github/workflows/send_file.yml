@@ -31,7 +31,7 @@ jobs:
         echo ${{ steps.test.outputs.download-path }}
         echo "ls file path: "
         ls -la  ${{ steps.test.outputs.download-path }}
-        echo "File content : "
+        echo "File content : " 
         cat ${{ steps.test.outputs.download-path }}/world.txt
 
     - name: Copy file via ssh password
