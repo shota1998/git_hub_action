@@ -6,7 +6,8 @@ on:
       - create_artifacts
     types:
       - completed
-    branches:  [send_file]
+    branches: 
+      - send_file
 
 jobs:
   send_file:
