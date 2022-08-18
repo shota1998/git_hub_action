@@ -1,8 +1,8 @@
-name: Rust
+name: dev
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "hoge-push-image" ]
   pull_request:
     branches: [ "main" ]
 
@@ -38,22 +38,12 @@ jobs:
         restore-keys: |
           ${{ github.ref }}
           refs/head/main
-        
-    # - name: Build and push
-    #   uses: docker/build-push-action@v3
-    #   with:
-    #     push: true
-    #     context: .
-    #     tags: user/app:latest
 
-    - name: Build images
+    - name: Build image
       uses: docker/build-push-action@v3
       with:
-        push: false
         builder: ${{ steps.buildx.outputs.name }}
-        tags: test:latest
         load: true
-        # context: docker/php-fpm
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
 
@@ -66,19 +56,36 @@ jobs:
     # -----------------------
     # Rust
     # -----------------------
-    # - name: Setup
-    #   run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+    - name: Install Python
+      uses: actions/setup-python@v2
 
-    # - name: Build
-    #   run: cargo build --verbose
+    - name: Restore mtime
+      run: python ./git-restore-mtime.py
 
-    # - name: Run tests
-    #   run: cargo test --verbose
+    - name: Cache Rust
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Setup
+      run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+
+    - name: Build
+      run: cargo build --verbose
+
+    - name: UT
+      run: docker-compose exec -T homepage-api bash -c "cargo test --verbose"
 
     # -----------------------
     # Teardown
     # -----------------------
-     - name: Move cache
-       run: |
-         rm -rf /tmp/.buildx-cache
-         mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+    - name: Move cache 
+      run: |
+        rm -rf /tmp/.buildx-cache
+        mv /tmp/.buildx-cache-new /tmp/.buildx-cache

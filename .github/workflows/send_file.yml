@@ -1,0 +1,29 @@
+name: send_file
+
+on:
+  workflow_run:
+    workflows: ["create_artifacts"]
+    types: 
+      - completed
+    branches:  
+      - send_file
+
+jobs:
+  send_file:
+
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Copy file via ssh password
+      uses: lBeJIuk/scp_action@v1
+      with:
+        public_key: ${{ secrets.KEY }}
+        ssh_port: 22
+        ssh_username: ${{ secrets.DEST_USER }}
+        ssh_host: ${{ secrets.DEST_IP }}
+        source: ${{ steps.test.outputs.download-path }}/world.txt
+        target: ${{ secrets.DEST_DIR }}
