@@ -24,9 +24,9 @@ jobs:
         name: my-artifacts
         path: path/to/artifacts/world.txt
         
-    # - name: Download artifacts
-    #   uses: actions/download-artifact@v3
-    #   id: test
-    #   with:
-    #     name: my-artifacts
-    #     path: path/to/artifacts
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      id: test
+      with:
+        name: my-artifacts
+        path: path/to/artifacts
