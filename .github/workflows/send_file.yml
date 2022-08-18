@@ -16,7 +16,7 @@ jobs:
     - name: Create artifacts
       run: |
         mkdir -p path/to/artifacts
-        echo hello > path/to/artifacts/world.txt
+        echo hello2 > path/to/artifacts/world.txt
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
@@ -26,6 +26,7 @@ jobs:
 
   send_artifacts:
     
+    needs: create_artifacts
     runs-on: ubuntu-latest
 
     steps:
