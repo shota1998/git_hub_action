@@ -25,4 +25,4 @@ jobs:
       id: test
       with:
         name: 'my-artifact'
-        path: path/to/artifacts
+        path: path/to/artifacts 
