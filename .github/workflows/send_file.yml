@@ -2,12 +2,9 @@ name: send_file
 
 on:
   workflow_run:
-    workflows: 
-      - create_artifacts
-    types:
-      - completed
-    branches: 
-      - send_file
+    workflows: create_artifacts
+    types:     completed
+    branches:  send_file
 
 jobs:
   send_file:
