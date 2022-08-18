@@ -1,31 +1,42 @@
 name: send_file
 
 on:
-  workflow_run:
-    workflows: ["create_artifacts"]
-    types: 
-      - completed
-    branches:  
-      - send_file
+  push:
+    branches: [ "send_file" ]
 
 jobs:
-  send_file:
+  create_artifacts:
 
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
     - name: Checkout
       uses: actions/checkout@v3
 
-    # - name: Download artifacts
-    #   uses: actions/download-artifact@v3
-    #   id: test
-    #   with:
-    #     name: my-artifacts
-    #     path: path/to/artifacts
+    - name: Create artifacts
+      run: |
+        mkdir -p path/to/artifacts
+        echo hello > path/to/artifacts/world.txt
 
-    - name: Confirm copied file
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: my-artifacts
+        path: path/to/artifacts/world.txt
+
+  send_artifacts:
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      id: test
+      with:
+        name: my-artifacts
+        path: path/to/artifacts
+
+    - name: Confirm artifacts
       run: |
         echo "File path: "
         echo ${{ steps.test.outputs.download-path }}
@@ -34,7 +45,7 @@ jobs:
         echo "File content : " 
         cat ${{ steps.test.outputs.download-path }}/world.txt
 
-    - name: Copy file via ssh password
+    - name: Send artifacts
       uses: lBeJIuk/scp_action@v1
       with:
         public_key: ${{ secrets.KEY }}
