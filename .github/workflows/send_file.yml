@@ -18,6 +18,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      id: test
+      with:
+        name: my-artifacts
+        path: path/to/artifacts
+
     - name: Copy file via ssh password
       uses: lBeJIuk/scp_action@v1
       with:
