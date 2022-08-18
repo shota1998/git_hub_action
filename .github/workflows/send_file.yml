@@ -1,8 +1,10 @@
 name: send_file
 
 on:
-  push:
-    branches: [ "send_file" ]
+  workflow_run:
+    workflows: ["create_artifacts"]
+    types:
+      - completed
 
 env:
   REGISTRY: ghcr.io
@@ -23,5 +25,5 @@ jobs:
         ssh_port: 22
         ssh_username: ${{ secrets.DEST_USER }}
         ssh_host: ${{ secrets.DEST_IP }}
-        source: docker-compose.yml
+        source: ${{ steps.test.outputs.download-path }}/world.txt
         target: ${{ secrets.DEST_DIR }}
