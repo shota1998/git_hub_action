@@ -2,15 +2,17 @@ name: send_file
 
 on:
   workflow_run:
-    workflows: [create_artifacts]
-    types:     [completed]
+    workflows: 
+      - create_artifacts
+    types:
+      - completed
     branches:  [send_file]
 
 jobs:
   send_file:
 
     runs-on: ubuntu-latest
-    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
     - name: Checkout
