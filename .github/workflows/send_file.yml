@@ -5,7 +5,7 @@ on:
     branches: [ "exec_command" ]
 
 env:
-  PATH_TO_ARTIFACTS: ${{ runner.temp }}/artifacts
+  PATH_TO_ARTIFACTS: path/to/artifacts/artifacts
   TAR_FILE_NAME: artifacts.tar
 
 jobs:
