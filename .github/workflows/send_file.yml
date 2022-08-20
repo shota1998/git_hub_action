@@ -73,35 +73,28 @@ jobs:
     needs: send_artifact
     runs-on: ubuntu-latest
 
-    steps:
-    - name: Generate private key
-      run: | 
-        echo "${{ secrets.KEY }}" > ${{ runner.temp }}/key
-        chmod 700 ${{ runner.temp }}/key
+    # steps:
+    # - name: Generate private key
+    #   run: | 
+    #     echo "${{ secrets.KEY }}" > ${{ runner.temp }}/key
+    #     chmod 700 ${{ runner.temp }}/key
 
+    - name: Generate ssh private key
+      uses: shimataro/ssh-key-action@v2
+        with: 
+          key: ${{ secrets.KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+          
     - name: Decompress artifact
       run: |
         ls -la ~/.ssh
         ssh \
           -t ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}
           -p 22 \
-          -i ${{ runner.temp }}/key \
           -o StrictHostKeyChecking=no \
-          -o UserKnownHostsFile=/dev/null \
-          -o ConnectTimeout=10 \
+          -o ConnectTimeout=5 \
           "
             tar -xvf ${{ env.TAR_FILE_NAME }} && \
             ls -la                            && \
             cat ${{ env.FILE_NAME}}
           "
-
-    # - name: Run app
-    #   run: |
-    #     ssh \
-    #       -t ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}
-    #       -p 22 \
-    #       -i ${{ runner.temp }}/key \
-    #       -o StrictHostKeyChecking=no \
-    #       -o UserKnownHostsFile=/dev/null \
-    #       -o ConnectTimeout=5 \
-    #       cat ${{ env.FILE_NAME}}
