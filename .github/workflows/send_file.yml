@@ -73,7 +73,7 @@ jobs:
     needs: send_artifact
     runs-on: ubuntu-latest
 
-    # steps:
+    steps:
     # - name: Generate private key
     #   run: | 
     #     echo "${{ secrets.KEY }}" > ${{ runner.temp }}/key
