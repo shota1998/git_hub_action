@@ -74,11 +74,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # - name: Generate private key
-    #   run: | 
-    #     echo "${{ secrets.KEY }}" > ${{ runner.temp }}/key
-    #     chmod 700 ${{ runner.temp }}/key
-
     - name: Generate ssh private key
       uses: shimataro/ssh-key-action@v2
         with: 
