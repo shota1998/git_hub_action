@@ -81,6 +81,7 @@ jobs:
 
     - name: Decompress artifact
       run: |
+        ls -la .ssh
         ssh \
           -t ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}
           -p 22 \
