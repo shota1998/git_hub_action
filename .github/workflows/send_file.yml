@@ -51,7 +51,7 @@ jobs:
         cat ${{ steps.test.outputs.download-path }}/world.txt
 
     - name: Compress artifacts
-        run: tar -cvf ${{ env.TAR_FILE_NAME }} ${{ steps.test.outputs.download-path }}
+      run: tar -cvf ${{ env.TAR_FILE_NAME }} ${{ steps.test.outputs.download-path }}
 
     - name: Send artifacts
       uses: lBeJIuk/scp_action@v1
