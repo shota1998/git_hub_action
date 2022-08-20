@@ -53,12 +53,19 @@ jobs:
     - name: Compress artifacts
       run: tar -cvf ${{ env.TAR_FILE_NAME }} ${{ steps.test.outputs.download-path }}
 
+    # - name: Send artifacts
+    #   uses: lBeJIuk/scp_action@v1
+    #   with:
+    #     public_key: ${{ secrets.KEY }}
+    #     ssh_port: 22
+    #     ssh_username: ${{ secrets.DEST_USER }}
+    #     ssh_host: ${{ secrets.DEST_IP }}
+    #     source: ${{ env.TAR_FILE_NAME }}
+    #     target: ${{ secrets.DEST_DIR }}
+
     - name: Send artifacts
-      uses: lBeJIuk/scp_action@v1
-      with:
-        public_key: ${{ secrets.KEY }}
-        ssh_port: 22
-        ssh_username: ${{ secrets.DEST_USER }}
-        ssh_host: ${{ secrets.DEST_IP }}
-        source: ${{ env.TAR_FILE_NAME }}
-        target: ${{ secrets.DEST_DIR }}
+      run |
+       echo ${{ secrets.KEY }} >> secret_key
+       scp -i secret_key -P 22 \
+           ${{ env.TAR_FILE_NAME }} \
+           ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
