@@ -83,11 +83,11 @@ jobs:
     - name: Decompress artifact
       run: |
         ls -la ~/.ssh
-        ssh \
-          -t ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}
-          -p 22 \
-          -o StrictHostKeyChecking=no \
-          -o ConnectTimeout=5 \
+        ssh                                                  \
+          -t ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }} \
+          -p 22                                              \
+          -o StrictHostKeyChecking=no                        \
+          -o ConnectTimeout=5                                \
           "
             tar -xvf ${{ env.TAR_FILE_NAME }} && \
             ls -la                            && \
