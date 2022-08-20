@@ -5,11 +5,11 @@ on:
     branches: [ "exec_command" ]
 
 env:
-  PATH_TO_ARTIFACTS: path/to/artifacts/artifacts
-  TAR_FILE_NAME: artifacts.tar
+  PATH_TO_ARTIFACT: path/to/artifact/artifact
+  TAR_FILE_NAME: artifact.tar
 
 jobs:
-  create_artifacts:
+  create_artifact:
 
     runs-on: ubuntu-latest
 
@@ -17,31 +17,31 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Create artifacts
+    - name: Create artifact
       run: |
-        mkdir -p ${{ env.PATH_TO_ARTIFACTS }}
-        echo hello2 > ${{ env.PATH_TO_ARTIFACTS }}/world.txt
+        mkdir -p ${{ env.PATH_TO_ARTIFACT }}
+        echo hello2 > ${{ env.PATH_TO_ARTIFACT }}/world.txt
 
-    - name: Upload artifacts
+    - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: my-artifacts
-        path: ${{ env.PATH_TO_ARTIFACTS }}/world.txt
+        name: my-artifact
+        path: ${{ env.PATH_TO_ARTIFACT }}/world.txt
 
-  send_artifacts:
+  send_artifact:
     
-    needs: create_artifacts
+    needs: create_artifact
     runs-on: ubuntu-latest
 
     steps:
-    - name: Download artifacts
+    - name: Download artifact
       uses: actions/download-artifact@v3
       id: test
       with:
-        name: my-artifacts
-        path: ${{ env.PATH_TO_ARTIFACTS }}
+        name: my-artifact
+        path: ${{ env.PATH_TO_ARTIFACT }}
 
-    - name: Confirm artifacts
+    - name: Show artifact
       run: |
         echo "File path: "
         echo ${{ steps.test.outputs.download-path }}
@@ -50,25 +50,15 @@ jobs:
         echo "File content : " 
         cat ${{ steps.test.outputs.download-path }}/world.txt
 
-    - name: Compress artifacts
+    - name: Compress artifact
       run: tar -cvf ${{ env.TAR_FILE_NAME }} ${{ steps.test.outputs.download-path }}
-
-    # - name: Send artifacts
-    #   uses: lBeJIuk/scp_action@v1
-    #   with:
-    #     public_key: ${{ secrets.KEY }}
-    #     ssh_port: 22
-    #     ssh_username: ${{ secrets.DEST_USER }}
-    #     ssh_host: ${{ secrets.DEST_IP }}
-    #     source: ${{ env.TAR_FILE_NAME }}
-    #     target: ${{ secrets.DEST_DIR }}
 
     - name: Generate private key
       run: | 
         echo "${{ secrets.KEY }}" > ${{ runner.temp }}/key
         chmod 700 ${{ runner.temp }}/key
 
-    - name: Send artifacts
+    - name: Send artifact
       run: |
         scp -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
@@ -76,3 +66,25 @@ jobs:
             -P 22 \
             ${{ env.TAR_FILE_NAME }} \
             ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
+
+  run_app:
+
+    needs: send_artifact
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Decompress artifact
+      run: |
+        ssh -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -i ${{ runner.temp }}/key \
+            -P 22 \
+            'tar -xvf ${{ env.TAR_FILE_NAME }} && ll'
+
+    - name: Run app
+      run: |
+        ssh -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -i ${{ runner.temp }}/key \
+            -P 22 \
+            'cat world.txt'
