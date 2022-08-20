@@ -66,10 +66,13 @@ jobs:
     - name: Generate private key
       run: | 
         echo "${{ secrets.KEY }}" > ${{ runner.temp }}/key
-        chmod 600 ${{ runner.temp }}/key
+        chmod 700 ${{ runner.temp }}/key
 
     - name: Send artifacts
       run: |
-        scp -i ${{ runner.temp }}/key -P 22 \
+        scp -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -i ${{ runner.temp }}/key \
+            -P 22 \
             ${{ env.TAR_FILE_NAME }} \
             ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
