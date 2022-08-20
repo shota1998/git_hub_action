@@ -2,7 +2,11 @@ name: send_file
 
 on:
   push:
-    branches: [ "send_file" ]
+    branches: [ "exec_command" ]
+
+env:
+  PATH_TO_ARTIFACTS: path/to/artifacts
+  TAR_FILE_NAME: artifacts.tar
 
 jobs:
   create_artifacts:
@@ -15,14 +19,14 @@ jobs:
 
     - name: Create artifacts
       run: |
-        mkdir -p path/to/artifacts
-        echo hello2 > path/to/artifacts/world.txt
+        mkdir -p ${{ env.PATH_TO_ARTIFACTS }}
+        echo hello2 > ${{ env.PATH_TO_ARTIFACTS }} / world.txt
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
         name: my-artifacts
-        path: path/to/artifacts/world.txt
+        path: ${{ env.PATH_TO_ARTIFACTS }} / world.txt
 
   send_artifacts:
     
@@ -35,7 +39,7 @@ jobs:
       id: test
       with:
         name: my-artifacts
-        path: path/to/artifacts
+        path: ${{ env.PATH_TO_ARTIFACTS }}
 
     - name: Confirm artifacts
       run: |
@@ -46,6 +50,9 @@ jobs:
         echo "File content : " 
         cat ${{ steps.test.outputs.download-path }}/world.txt
 
+    - name: Compress artifacts
+        run: tar -cvf ${{ env.TAR_FILE_NAME }} ${{ steps.test.outputs.download-path }}
+
     - name: Send artifacts
       uses: lBeJIuk/scp_action@v1
       with:
@@ -53,5 +60,5 @@ jobs:
         ssh_port: 22
         ssh_username: ${{ secrets.DEST_USER }}
         ssh_host: ${{ secrets.DEST_IP }}
-        source: ${{ steps.test.outputs.download-path }}/world.txt
+        source: ${{ env.TAR_FILE_NAME }}
         target: ${{ secrets.DEST_DIR }}
