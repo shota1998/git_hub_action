@@ -84,8 +84,9 @@ jobs:
             -o UserKnownHostsFile=/dev/null \
             -o ConnectTimeout=5
             -i ${{ runner.temp }}/key \
+            -l ${{ secrets.DEST_USER }} \
+            -R ${{ secrets.DEST_IP }} \
             -P 22 \
-            ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }} \
             'tar -xvf ${{ env.TAR_FILE_NAME }} && ll'
 
     - name: Run app
@@ -94,6 +95,7 @@ jobs:
             -o UserKnownHostsFile=/dev/null \
             -o ConnectTimeout=5
             -i ${{ runner.temp }}/key \
+            -l ${{ secrets.DEST_USER }} \
+            -R ${{ secrets.DEST_IP }} \
             -P 22 \
-            ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }} \
             'cat world.txt'
