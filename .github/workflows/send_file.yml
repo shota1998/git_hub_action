@@ -86,7 +86,6 @@ jobs:
           -p 22 \
           -i ${{ runner.temp }}/key \
           -o StrictHostKeyChecking=no \
-          -o UserKnownHostsFile=/dev/null \
           -o ConnectTimeout=5 \
           "
             tar -xvf ${{ env.TAR_FILE_NAME }} && \
