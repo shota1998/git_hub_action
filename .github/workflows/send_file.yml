@@ -54,15 +54,20 @@ jobs:
     - name: Compress artifact
       run: tar -cvf ${{ env.TAR_FILE_NAME }} ${{ steps.test.outputs.download-path }}
 
-    - name: Generate private key
-      run: | 
-        echo "${{ secrets.KEY }}" > ${{ runner.temp }}/key
-        chmod 700 ${{ runner.temp }}/key
+    # - name: Generate private key
+    #   run: | 
+    #     echo "${{ secrets.KEY }}" > ${{ runner.temp }}/key
+    #     chmod 700 ${{ runner.temp }}/key
+
+    - name: Generate ssh private key
+      uses: shimataro/ssh-key-action@v2
+      with: 
+        key: ${{ secrets.KEY }}
+        known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
     - name: Send artifact
       run: |
         scp -o StrictHostKeyChecking=no \
-            -o UserKnownHostsFile=/dev/null \
             -i ${{ runner.temp }}/key \
             -P 22 \
             ${{ env.TAR_FILE_NAME }} \
