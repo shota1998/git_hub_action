@@ -88,11 +88,11 @@ jobs:
           -o StrictHostKeyChecking=no \
           -o UserKnownHostsFile=/dev/null \
           -o ConnectTimeout=5 \
-          << EOF
-            tar -xvf ${{ env.TAR_FILE_NAME }}
-            ls -la
+          "
+            tar -xvf ${{ env.TAR_FILE_NAME }} && \
+            ls -la                            && \
             cat ${{ env.FILE_NAME}}
-EOF
+          "
 
     # - name: Run app
     #   run: |
