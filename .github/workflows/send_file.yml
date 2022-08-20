@@ -65,7 +65,7 @@ jobs:
 
     - name: Send artifacts
       run: |
-       echo ${{ secrets.KEY }} >> secret_key
+       echo "${{ secrets.KEY }}" >> secret_key
        scp -i secret_key -P 22 \
            ${{ env.TAR_FILE_NAME }} \
            ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
