@@ -5,7 +5,7 @@ on:
     branches: [ "exec_command" ]
 
 env:
-  PATH_TO_ARTIFACTS: path/to/artifacts
+  PATH_TO_ARTIFACTS: ${{ runner.temp }}/artifacts
   TAR_FILE_NAME: artifacts.tar
 
 jobs:
@@ -63,9 +63,13 @@ jobs:
     #     source: ${{ env.TAR_FILE_NAME }}
     #     target: ${{ secrets.DEST_DIR }}
 
+    - name: Generate private key
+      run: | 
+        echo "${{ secrets.KEY }}" > ${{ runner.temp }}/key
+        chmod 600 ${{ runner.temp }}/key
+
     - name: Send artifacts
       run: |
-       echo "${{ secrets.KEY }}" >> secret_key
-       scp -i secret_key -P 22 \
-           ${{ env.TAR_FILE_NAME }} \
-           ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
+        scp -i ${{ runner.temp }}/key -P 22 \
+            ${{ env.TAR_FILE_NAME }} \
+            ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
