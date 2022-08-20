@@ -73,12 +73,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Generate private key
+      run: | 
+        echo "${{ secrets.KEY }}" > ${{ runner.temp }}/key
+        chmod 700 ${{ runner.temp }}/key
+        
     - name: Decompress artifact
       run: |
         ssh -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
             -i ${{ runner.temp }}/key \
             -P 22 \
+            ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }} \
             'tar -xvf ${{ env.TAR_FILE_NAME }} && ll'
 
     - name: Run app
@@ -87,4 +93,5 @@ jobs:
             -o UserKnownHostsFile=/dev/null \
             -i ${{ runner.temp }}/key \
             -P 22 \
+            ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }} \
             'cat world.txt'
