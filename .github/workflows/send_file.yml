@@ -7,6 +7,7 @@ on:
 env:
   PATH_TO_ARTIFACT: path/to/artifact/artifact
   TAR_FILE_NAME: artifact.tar
+  FILE_NAME: world.txt
 
 jobs:
   create_artifact:
@@ -20,13 +21,13 @@ jobs:
     - name: Create artifact
       run: |
         mkdir -p ${{ env.PATH_TO_ARTIFACT }}
-        echo hello2 > ${{ env.PATH_TO_ARTIFACT }}/world.txt
+        echo hello2 > ${{ env.PATH_TO_ARTIFACT }}/${{ env.FILE_NAME}}
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: my-artifact
-        path: ${{ env.PATH_TO_ARTIFACT }}/world.txt
+        path: ${{ env.PATH_TO_ARTIFACT }}/${{ env.FILE_NAME}}
 
   send_artifact:
     
@@ -48,7 +49,7 @@ jobs:
         echo "ls file path: "
         ls -la  ${{ steps.test.outputs.download-path }}
         echo "File content : " 
-        cat ${{ steps.test.outputs.download-path }}/world.txt
+        cat ${{ steps.test.outputs.download-path }}/${{ env.FILE_NAME}}
 
     - name: Compress artifact
       run: tar -cvf ${{ env.TAR_FILE_NAME }} ${{ steps.test.outputs.download-path }}
@@ -80,22 +81,26 @@ jobs:
 
     - name: Decompress artifact
       run: |
-        ssh -o StrictHostKeyChecking=no \
-            -o UserKnownHostsFile=/dev/null \
-            -o ConnectTimeout=5
-            -i ${{ runner.temp }}/key \
-            -l ${{ secrets.DEST_USER }} \
-            -R ${{ secrets.DEST_IP }} \
-            -P 22 \
-            
+        ssh \
+          -t ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}
+          -p 22 \
+          -i ${{ runner.temp }}/key \
+          -o StrictHostKeyChecking=no \
+          -o UserKnownHostsFile=/dev/null \
+          -o ConnectTimeout=5 \
+          << EOF
+            tar -xvf ${{ env.TAR_FILE_NAME }}
+            ls -la
+            cat ${{ env.FILE_NAME}}
+EOF
 
-    - name: Run app
-      run: |
-        ssh -o StrictHostKeyChecking=no \
-            -o UserKnownHostsFile=/dev/null \
-            -o ConnectTimeout=5
-            -i ${{ runner.temp }}/key \
-            -l ${{ secrets.DEST_USER }} \
-            -R ${{ secrets.DEST_IP }} \
-            -P 22 \
-            'cat world.txt'
+    # - name: Run app
+    #   run: |
+    #     ssh \
+    #       -t ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}
+    #       -p 22 \
+    #       -i ${{ runner.temp }}/key \
+    #       -o StrictHostKeyChecking=no \
+    #       -o UserKnownHostsFile=/dev/null \
+    #       -o ConnectTimeout=5 \
+    #       cat ${{ env.FILE_NAME}}
