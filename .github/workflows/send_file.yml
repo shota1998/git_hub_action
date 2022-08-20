@@ -52,12 +52,9 @@ jobs:
         cat ${{ steps.test.outputs.download-path }}/${{ env.FILE_NAME}}
 
     - name: Compress artifact
-      run: tar -cvf ${{ env.TAR_FILE_NAME }} ${{ steps.test.outputs.download-path }}
-
-    # - name: Generate private key
-    #   run: | 
-    #     echo "${{ secrets.KEY }}" > ${{ runner.temp }}/key
-    #     chmod 700 ${{ runner.temp }}/key
+      run: |
+        cd ${{ steps.test.outputs.download-path }}
+        tar -cvf ~/${{ env.TAR_FILE_NAME }} .
 
     - name: Generate ssh private key
       uses: shimataro/ssh-key-action@v2
@@ -68,9 +65,9 @@ jobs:
     - name: Send artifact
       run: |
         scp -o StrictHostKeyChecking=no \
-            -i ${{ runner.temp }}/key \
-            -P 22 \
-            ${{ env.TAR_FILE_NAME }} \
+            -i ${{ runner.temp }}/key   \
+            -P 22                       \
+            ~/${{ env.TAR_FILE_NAME }}  \
             ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
 
   run_app:
@@ -85,9 +82,10 @@ jobs:
         key: ${{ secrets.KEY }}
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
           
+    - run: ls -la ~/.ssh
+
     - name: Decompress artifact
       run: |
-        ls -la ~/.ssh
         ssh                                                  \
           -t ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }} \
           -p 22                                              \
