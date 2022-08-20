@@ -87,7 +87,7 @@ jobs:
             -l ${{ secrets.DEST_USER }} \
             -R ${{ secrets.DEST_IP }} \
             -P 22 \
-            'tar -xvf ${{ env.TAR_FILE_NAME }} && ll'
+            
 
     - name: Run app
       run: |
