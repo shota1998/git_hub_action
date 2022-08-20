@@ -77,11 +77,12 @@ jobs:
       run: | 
         echo "${{ secrets.KEY }}" > ${{ runner.temp }}/key
         chmod 700 ${{ runner.temp }}/key
-        
+
     - name: Decompress artifact
       run: |
         ssh -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
+            -o ConnectTimeout=5
             -i ${{ runner.temp }}/key \
             -P 22 \
             ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }} \
@@ -91,6 +92,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
+            -o ConnectTimeout=5
             -i ${{ runner.temp }}/key \
             -P 22 \
             ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }} \
