@@ -51,6 +51,9 @@ jobs:
         echo "File content : " 
         cat ${{ steps.test.outputs.download-path }}/${{ env.FILE_NAME}}
 
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      
     - name: Compress artifact
       run: |
         mv docker-compose.yml ${{ steps.test.outputs.download-path }}
