@@ -63,16 +63,16 @@ jobs:
         cd ${{ steps.test.outputs.download-path }}
         tar -cvf ~/${{ env.TAR_FILE_NAME }} .
 
-    # - name: Generate ssh private key
-    #   uses: shimataro/ssh-key-action@v2
-    #   with: 
-    #     key: ${{ secrets.KEY }}
-    #     known_hosts: ${{ secrets.KNOWN_HOSTS }}
+    - name: Generate ssh private key
+      uses: shimataro/ssh-key-action@v2
+      with: 
+        key: ${{ secrets.KEY }}
+        known_hosts: ${{ secrets.KNOWN_HOSTS }}
+        if_key_exists : replace
 
     - name: Send artifact
       run: |
         scp -o StrictHostKeyChecking=no \
-            -i ${{ runner.temp }}/key   \
             -P 22                       \
             ~/${{ env.TAR_FILE_NAME }}  \
             ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
@@ -88,6 +88,7 @@ jobs:
       with: 
         key: ${{ secrets.KEY }}
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
+        if_key_exists : replace
           
     - run: ls -la ~/.ssh
 
