@@ -53,6 +53,7 @@ jobs:
 
     - name: Compress artifact
       run: |
+        mv docker-compose.yml ${{ steps.test.outputs.download-path }}
         cd ${{ steps.test.outputs.download-path }}
         tar -cvf ~/${{ env.TAR_FILE_NAME }} .
 
@@ -94,5 +95,5 @@ jobs:
           "
             tar -xvf ${{ env.TAR_FILE_NAME }} && \
             ls -la                            && \
-            cat ${{ env.FILE_NAME}}
+            docker-compose -f docker-compose.yml up 
           "
