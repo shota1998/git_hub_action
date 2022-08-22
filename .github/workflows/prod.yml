@@ -2,14 +2,17 @@ name: prod
 
 on:
   push:
-    branches: [ "push-image" ]
+    branches: [ "run_app" ]
 
 env:
   CARGO_TERM_COLOR: always
   REGISTRY: ghcr.io
+  PATH_TO_ARTIFACT: target/debug
+  TAR_FILE_NAME: artifact.tar
+  FILE_NAME: mybin
 
 jobs:
-  build:
+  build_docker:
 
     runs-on: ubuntu-latest
 
@@ -17,9 +20,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    # -----------------------
-    # Docker
-    # -----------------------
     - name: Login to GitHub Container registry
       uses: docker/login-action@v2
       with:
@@ -49,15 +49,19 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
 
-    # - name: docker compose up
-    #   run: |
-    #     mkdir -p /tmp/.composer-cache
-    #     docker compose -f docker-compose.yml build
-    #     docker compose -f docker-compose.yml up -d
+    - name: Move cache 
+      run: |
+        rm -rf /tmp/.buildx-cache
+        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
-    # -----------------------
-    # Rust
-    # -----------------------
+  build_rust:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
     - name: Install Python
       uses: actions/setup-python@v2
 
@@ -78,10 +82,84 @@ jobs:
     - name: Build
       run: cargo build --verbose
 
-    # -----------------------
-    # Teardown
-    # -----------------------
-    - name: Move cache 
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: my-artifact
+        path: ${{ env.PATH_TO_ARTIFACT }}/${{ env.FILE_NAME}}
+
+  send_artifact:
+    
+    needs: [build_docker, build_rust]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      id: test
+      with:
+        name: my-artifact
+        path: ${{ env.PATH_TO_ARTIFACT }}
+
+    - name: Show artifact
       run: |
-        rm -rf /tmp/.buildx-cache
-        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+        echo ${{ steps.test.outputs.download-path }}
+        ls -la  ${{ steps.test.outputs.download-path }}
+        cat ${{ steps.test.outputs.download-path }}/${{ env.FILE_NAME}}
+
+    - name: Compress artifact
+      run: |
+        mv docker-compose.yml ${{ steps.test.outputs.download-path }}
+        cd ${{ steps.test.outputs.download-path }}
+        tar -cvf ~/${{ env.TAR_FILE_NAME }} .
+
+    - name: Generate ssh private key
+      uses: shimataro/ssh-key-action@v2
+      with: 
+        key: ${{ secrets.KEY }}
+        known_hosts: ${{ secrets.KNOWN_HOSTS }}
+        if_key_exists : replace
+
+    # - name: Setup tmate session
+    #   uses: mxschmitt/action-tmate@v3
+
+    - name: Send artifact
+      run: |
+        scp -o StrictHostKeyChecking=no \
+            -P 22                       \
+            ~/${{ env.TAR_FILE_NAME }}  \
+            ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }}:${{ secrets.DEST_DIR }}
+
+  run_app:
+
+    needs: send_artifact
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Generate ssh private key
+      uses: shimataro/ssh-key-action@v2
+      with: 
+        key: ${{ secrets.KEY }}
+        known_hosts: ${{ secrets.KNOWN_HOSTS }}
+        if_key_exists : replace
+          
+    - run: ls -la ~/.ssh
+
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+
+    - name: Decompress artifact
+      run: |
+        ssh                                                  \
+          -t ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }} \
+          -p 22                                              \
+          -o StrictHostKeyChecking=no                        \
+          -o ConnectTimeout=5                                \
+          "
+            tar -xvf ${{ env.TAR_FILE_NAME }} && \
+            ls -la                            && \
+            docker-compose -f docker-compose.yml up -d 
+          "
