@@ -48,7 +48,8 @@ jobs:
         push: true
         tags: ${{ env.REGISTRY }}/${{ github.actor }}name3:latest
         cache-from: type=gha
-        cache-to:   type=gha,mode=max
+        # cache-to:   type=gha, mode=max
+        cache-to:   type=gha
 
     # - name: Move cache 
     #   run: |
