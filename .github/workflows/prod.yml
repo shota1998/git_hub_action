@@ -45,7 +45,7 @@ jobs:
       with:
         builder: ${{ steps.buildx.outputs.name }}
         push: true
-        tags: ${{ env.REGISTRY }}/${{ github.actor }}name3:latest
+        tags: ${{ env.REGISTRY }}/${{ github.actor }}/name2/name1:latest
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
 
