@@ -43,7 +43,8 @@ jobs:
     - name: Push image
       uses: docker/build-push-action@v3
       with:
-        builder: ${{ steps.buildx.outputs.name }}
+        # builder: ${{ steps.buildx.outputs.name }}
+        context: .
         push: true
         tags: ${{ env.REGISTRY }}/${{ github.actor }}name3:latest
         cache-from: type=gha
