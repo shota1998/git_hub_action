@@ -2,7 +2,7 @@ name: send_file
 
 on:
   push:
-    branches: [ "run_app" ]
+    branches: [ "run_app_tmp" ]
 
 env:
   PATH_TO_ARTIFACT: path/to/artifact/artifact
