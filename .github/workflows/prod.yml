@@ -31,14 +31,14 @@ jobs:
       id: buildx
       uses: docker/setup-buildx-action@v2
 
-    # - name: Cache Docker layers
-    #   uses: actions/cache@v3
-    #   with:
-    #     path: /tmp/.buildx-cache
-    #     key: ${{ github.ref }}-${{ github.sha }}
-    #     restore-keys: |
-    #       ${{ github.ref }}
-    #       refs/head/main
+    - name: Cache Docker layers
+      uses: actions/cache@v3
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ github.ref }}-${{ github.sha }}
+        restore-keys: |
+          ${{ github.ref }}
+          refs/head/main
 
     - name: Push image
       uses: docker/build-push-action@v3
@@ -47,14 +47,13 @@ jobs:
         context: .
         push: true
         tags: ${{ env.REGISTRY }}/${{ github.actor }}name3:latest
-        cache-from: type=gha
-        # cache-to:   type=gha, mode=max
-        cache-to:   type=gha
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new
 
-    # - name: Move cache 
-    #   run: |
-    #     rm -rf /tmp/.buildx-cache
-    #     mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+    - name: Move cache 
+      run: |
+        rm -rf /tmp/.buildx-cache
+        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   build_rust:
 
