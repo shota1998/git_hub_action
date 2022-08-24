@@ -11,6 +11,8 @@ env:
   TAR_FILE_NAME: artifact.tar
   FILE_NAME: mybin
 
+  PATH_TO_IMAGE_CACHE: /tmp/.buildx-cache-v2
+
 jobs:
   build_docker:
 
@@ -34,7 +36,7 @@ jobs:
     - name: Cache Docker layers
       uses: actions/cache@v3
       with:
-        path: /tmp/.buildx-cache-v2
+        path: ${{ env.PATH_TO_IMAGE_CACHE }}
         key: ${{ github.ref }}-v2-${{ github.sha }}
         restore-keys: |
           ${{ github.ref }}-v2
@@ -43,19 +45,18 @@ jobs:
     - name: Push image
       uses: docker/build-push-action@v3
       with:
-        # buildkitd-flags: --debug
         builder: ${{ steps.buildx.outputs.name }}
-        context: ./
-        file: ./Dockerfile
+        # context: ./
+        # file: ./Dockerfile
         push: true
         tags: ${{ env.REGISTRY }}/${{ github.actor }}name3:latest
-        cache-from: type=local,src=/tmp/.buildx-cache-v2
+        cache-from: type=local,src=${{ env.PATH_TO_IMAGE_CACHE }}
         cache-to: type=local,dest=/tmp/.buildx-cache-new
 
     - name: Move cache 
       run: |
-        rm -rf /tmp/.buildx-cache-v2
-        mv /tmp/.buildx-cache-new /tmp/.buildx-cache-v2
+        rm -rf ${{ env.PATH_TO_IMAGE_CACHE }}
+        mv /tmp/.buildx-cache-new ${{ env.PATH_TO_IMAGE_CACHE }}
 
   build_rust:
 
