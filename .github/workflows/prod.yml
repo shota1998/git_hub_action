@@ -46,12 +46,12 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         builder: ${{ steps.buildx.outputs.name }}
-        # context: ./
-        # file: ./Dockerfile
+        context: ./
+        file: ./Dockerfile
         push: true
         tags: ${{ env.REGISTRY }}/${{ github.actor }}name3:latest
-        cache-from: type=local,src=${{ env.PATH_TO_IMAGE_CACHE }}
-        cache-to: type=local,dest=/tmp/.buildx-cache-new
+        # cache-from: type=local,src=${{ env.PATH_TO_IMAGE_CACHE }}
+        # cache-to: type=local,dest=/tmp/.buildx-cache-new
 
     - name: Move cache 
       run: |
