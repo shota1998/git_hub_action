@@ -43,7 +43,7 @@ jobs:
     - name: Push image
       uses: docker/build-push-action@v3
       with:
-        buildkitd-flags: --debug
+        # buildkitd-flags: --debug
         builder: ${{ steps.buildx.outputs.name }}
         context: ./
         file: ./Dockerfile
