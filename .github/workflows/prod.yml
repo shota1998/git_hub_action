@@ -35,9 +35,9 @@ jobs:
       uses: actions/cache@v3
       with:
         path: /tmp/.buildx-cache
-        key: ${{ github.ref }}-${{ github.sha }}
+        key: ${{ github.ref }}-v2-${{ github.sha }}
         restore-keys: |
-          ${{ github.ref }}
+          ${{ github.ref }}-v2
           refs/head/main
 
     - name: Push image
