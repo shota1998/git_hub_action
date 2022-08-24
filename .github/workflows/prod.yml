@@ -49,10 +49,8 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: ${{ env.REGISTRY }}/${{ github.actor }}name3:latest
-        # cache-from: type=local,src=/tmp/.buildx-cache
-        # cache-to: type=local,dest=/tmp/.buildx-cache-new
-        cache-from: type=${{ env.REGISTRY }}, src=/tmp/.buildx-cache
-        cache-to:   type=${{ env.REGISTRY }}, dest=/tmp/.buildx-cache-new
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new
 
     - name: Move cache 
       run: |
