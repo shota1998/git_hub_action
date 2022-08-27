@@ -156,6 +156,7 @@ jobs:
           -o ConnectTimeout=5                                \
           "
             tar -xvf ${{ env.TAR_FILE_NAME }}
+            chmod 755 ./mybin
             ls -la
           "
 
