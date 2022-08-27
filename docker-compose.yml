@@ -3,7 +3,10 @@ version: '3'
 services:
   homepage-api:
     container_name: 'homepage-api'
-    image: ghcr.io/shota1998/name2/name1:latest
+    # image: ghcr.io/shota1998/name2/name1:latest
+    build:
+      dockerfile: ./Dockerfile
+      context: .
     tty: true
     volumes:
       - .:/workspace
@@ -12,3 +15,6 @@ services:
       - SYS_PTRACE
     security_opt:
       - seccomp:unconfined
+    ports:
+      - '8080:8080'
+    # command: ./target/debug/mybin

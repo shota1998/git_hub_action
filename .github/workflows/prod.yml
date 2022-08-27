@@ -155,9 +155,6 @@ jobs:
           
     - run: ls -la ~/.ssh
 
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
-
     - name: Decompress artifact
       run: |
         ssh                                                  \
@@ -169,4 +166,9 @@ jobs:
             tar -xvf ${{ env.TAR_FILE_NAME }} && \
             ls -la                            && \
             docker-compose -f docker-compose.yml up -d 
+            docker-compose exec -d homepage-api bash -c "./mybin"
+            curl -i localhost:8080 -o /dev/null -w '%{http_code}\n' -s
           "
+          
+    - name: Health check
+      run: curl -i {{ secrets.DEST_IP }}:8080 -o /dev/null -w '%{http_code}\n' -s
