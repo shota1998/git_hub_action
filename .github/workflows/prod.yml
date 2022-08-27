@@ -112,10 +112,7 @@ jobs:
         path: ${{ env.PATH_TO_ARTIFACT }}
 
     - name: Show artifact
-      run: |
-        echo ${{ steps.test.outputs.download-path }}
-        ls -la  ${{ steps.test.outputs.download-path }}
-        cat ${{ steps.test.outputs.download-path }}/${{ env.FILE_NAME}}
+      run: ls -la  ${{ steps.test.outputs.download-path }}
 
     - name: Compress artifact
       run: |
@@ -129,9 +126,6 @@ jobs:
         key: ${{ secrets.KEY }}
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
         if_key_exists : replace
-
-    # - name: Setup tmate session
-    #   uses: mxschmitt/action-tmate@v3
 
     - name: Send artifact
       run: |
@@ -152,8 +146,6 @@ jobs:
         key: ${{ secrets.KEY }}
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
         if_key_exists : replace
-          
-    - run: ls -la ~/.ssh
 
     - name: Decompress artifact
       run: |
@@ -165,10 +157,20 @@ jobs:
           "
             tar -xvf ${{ env.TAR_FILE_NAME }} && \
             ls -la                            && \
+          "
+          
+    - name: Run app
+      run: |
+        ssh                                                  \
+          -t ${{ secrets.DEST_USER }}@${{ secrets.DEST_IP }} \
+          -p 22                                              \
+          -o StrictHostKeyChecking=no                        \
+          -o ConnectTimeout=5                                \
+          "
             docker-compose -f docker-compose.yml up -d 
             docker-compose exec -d homepage-api bash -c "./mybin"
             curl -i localhost:8080 -o /dev/null -w '%{http_code}\n' -s
           "
-          
+
     - name: Health check
       run: curl -i {{ secrets.DEST_IP }}:8080 -o /dev/null -w '%{http_code}\n' -s
