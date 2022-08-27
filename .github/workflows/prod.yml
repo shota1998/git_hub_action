@@ -172,6 +172,8 @@ jobs:
             docker-compose exec -d homepage-api bash -c "./mybin"
             curl -i localhost:8080 -o /dev/null -w '%{http_code}\n' -s
           "
-
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      
     - name: Health check
       run: curl -i {{ secrets.DEST_IP }}:8080 -o /dev/null -w '%{http_code}\n' -s
